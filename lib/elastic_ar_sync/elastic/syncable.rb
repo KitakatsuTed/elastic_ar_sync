@@ -73,11 +73,10 @@ module ElasticArSync
           settings index: { number_of_shards: number_of_shards } do
             # ES6からStringが使えないのでtextかkeywordにする。
             mappings dynamic: dynamic do
-                attr_mappings.each do |key, value|
-                mapping_hash = value[:key]
-                next unless mapping_hash.is_a?(Hash)
+              attr_mappings.each do |key, value|
+                next unless value.is_a?(Hash)
 
-                indexes key, mapping_hash
+                indexes key, value
               end
             end
           end
@@ -108,6 +107,10 @@ module ElasticArSync
 
         def current_index
           get_aliases.select { |_, value| value["aliases"].present? }.keys.first
+        end
+
+        def current_mapping
+          __elasticsearch__.client.indices.get_mapping[current_index]["mappings"]["_doc"]["properties"]
         end
       end
     end
