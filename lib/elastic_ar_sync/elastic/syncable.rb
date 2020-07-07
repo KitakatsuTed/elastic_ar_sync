@@ -109,6 +109,10 @@ module ElasticArSync
         def current_index
           get_aliases.select { |_, value| value["aliases"].present? }.keys.first
         end
+
+        def current_mapping
+          __elasticsearch__.client.indices.get_mapping[current_index]["mappings"]["_doc"]["properties"]
+        end
       end
     end
   end
