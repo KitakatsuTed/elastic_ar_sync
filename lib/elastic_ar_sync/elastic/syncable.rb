@@ -67,10 +67,10 @@ module ElasticArSync
           ElasticArSync::Elastic::Services::IndexHandler.new(self).switch_alias(alias_name: index_name, new_index_name: new_index_name)
         end
 
-        def index_config(dynamic: 'false', number_of_shards: 1, attr_mappings: default_index_mapping, override_mappings: {})
+        def index_config(dynamic: 'false', override_settings: {}, attr_mappings: default_index_mapping, override_mappings: {})
           attr_mappings.merge!(override_mappings) if override_mappings.present?
 
-          settings index: { number_of_shards: number_of_shards } do
+          settings default_index_setting.merge!(override_settings) do
             # ES6からStringが使えないのでtextかkeywordにする。
             mappings dynamic: dynamic do
               attr_mappings.each do |key, value|
@@ -80,6 +80,10 @@ module ElasticArSync
               end
             end
           end
+        end
+
+        def default_index_setting
+          { index: { number_of_shards: 1 } }
         end
 
         def default_index_mapping
