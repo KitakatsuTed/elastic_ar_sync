@@ -67,12 +67,17 @@ module ElasticArSync
           ElasticArSync::Elastic::Services::IndexHandler.new(self).switch_alias(alias_name: index_name, new_index_name: new_index_name)
         end
 
-        def index_config(dynamic: 'false', number_of_shards: 1, attr_mappings: default_index_mapping)
+        def index_config(dynamic: 'false', number_of_shards: 1, attr_mappings: default_index_mapping, override_mappings: {})
+          attr_mappings.merge!(override_mappings) if override_mappings.present?
+
           settings index: { number_of_shards: number_of_shards } do
             # ES6からStringが使えないのでtextかkeywordにする。
             mappings dynamic: dynamic do
-              attr_mappings.each do |key, value|
-                indexes key, type: value
+                attr_mappings.each do |key, value|
+                mapping_hash = value[:key]
+                next unless mapping_hash.is_a?(Hash)
+
+                indexes key, mapping_hash
               end
             end
           end
@@ -84,7 +89,7 @@ module ElasticArSync
             type = active_model_type.type
             type = :text if (active_model_type.type.to_sym == :string) || (type == :integer && defined_enums.symbolize_keys.keys.include?(attribute.to_sym))
             type = :date if active_model_type.type == :datetime
-            mapping[attribute.to_sym] = type
+            mapping[attribute.to_sym] = { type: type }
           end
           mapping
         end
