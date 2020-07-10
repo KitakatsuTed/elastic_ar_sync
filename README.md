@@ -94,7 +94,17 @@ index_config(override_mappings: { birth: :keyword })
 
 then birth will mapping as keyword type in index of elasticsearch.
 
-if you define your original mapping additionally, you can define like below.
+if you want add mapping which is not defined as schema column of model, you can save method result as well like below.
+
+```ruby
+index_config(override_mappings: { full_name: :keyword })
+```
+
+＊`full_name` is instance method
+
+then full_name will mapped to index mapping as keyword type. but you have to define instance method full_name to your model class.
+
+if you define your original mapping additionally, you can also define like below.
 
 ```ruby
   settings index: { number_of_shards: number_of_shards } do
