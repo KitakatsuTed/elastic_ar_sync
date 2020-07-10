@@ -38,7 +38,8 @@ module ElasticArSync
 
         def as_indexed_json(_option = {})
           hash = {}
-          self.class.mapping_list_keys.each { |key| hash[key.to_s] = send(key) }.as_json
+          self.class.mapping_list_keys.each { |key| hash[key.to_s] = send(key) }
+          [hash].as_json
         end
       end
 
