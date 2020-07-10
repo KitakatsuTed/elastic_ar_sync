@@ -14,6 +14,7 @@ example below
 ```ruby
 class XXXXX < ActiveRecord
   include ElasticArSync::Elastic::Syncable
+  index_config
 end
 ```
 
