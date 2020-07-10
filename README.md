@@ -9,6 +9,10 @@ Install `gem elasticsearch-rails`, `gem elasticsearch-model` and `gem elasticsea
 
 Include module `ElasticArSync::Elastic::Syncable` on your Model class which is inherited ActiveRecord.
 
+and define `index_config` after `include ElasticArSync::Elastic::Syncable` if you use this module normally.
+
+you can override index_config described after.
+
 example below
 
 ```ruby
@@ -24,6 +28,13 @@ when you create new record elasticsearch index save new document in sync.
 update and delete is same as create.
 
 this module contains class method `index_setup` to setup index.
+
+setup means create new index and put alias to new index and sync whole records of RDB with new index,
+then you can use new index without any command.
+
+```ruby
+XXXXX.index_setup
+```
 
 ### usable methods
 if your Model class included `ElasticArSync::Elastic::Syncable`, it can use class methods below.
@@ -67,17 +78,24 @@ you can use `index_config` after `include ElasticArSync::Elastic::Syncable`.
 
 example below
 
-you can override argus `dynamic`, `number_of_shards`, `attr_mappings`.
+you can override args `dynamic`, `number_of_shards`, `attr_mappings`.
 especially default mapping is whole attributes of your Model class, so you can customize mapping attributes by overriding attr_mappings.
 ```ruby
 index_config(dynamic: 'false', number_of_shards: 1, attr_mappings: { id: 'integer', name: 'text', birth: 'date' })
 ```
 
+you can also override part of attributes by `override_mappings` like below
+
+＊As a premise, your model contain [id: integer, name: string, birth: date]
+
+```ruby
+index_config(override_mappings: { birth: :keyword })
+```
+
+then birth will mapping as keyword type in index of elasticsearch.
+
 if you define your original mapping additionally, you can define like below.
 
-tips: just reference here.
-
-https://github.com/elastic/elasticsearch-rails/tree/master/elasticsearch-model
 ```ruby
   settings index: { number_of_shards: number_of_shards } do
     mappings do
@@ -86,6 +104,9 @@ https://github.com/elastic/elasticsearch-rails/tree/master/elasticsearch-model
   end
 ```
 
+tips: just reference here.
+
+https://github.com/elastic/elasticsearch-rails/tree/master/elasticsearch-model
 
 ## Installation
 Add this line to your application's Gemfile:
