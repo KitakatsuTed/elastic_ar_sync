@@ -69,10 +69,10 @@ module ElasticArSync
           ElasticArSync::Elastic::Services::IndexHandler.new(self).switch_alias(alias_name: index_name, new_index_name: new_index_name)
         end
 
-        def index_config(dynamic: 'false', override_settings: {}, attr_mappings: default_index_mapping, override_mappings: {})
+        def index_config(dynamic: 'false', override_settings: {}, attr_mappings: default_index_mapping, override_mappings: {}, kuromoji_default: false)
           attr_mappings.merge!(override_mappings) if override_mappings.present?
 
-          settings default_index_setting.merge!(override_settings) do
+          settings default_index_setting(kuromoji_default).merge!(override_settings) do
             # ES6からStringが使えないのでtextかkeywordにする。
             mappings dynamic: dynamic do
               attr_mappings.each do |key, value|
@@ -91,8 +91,36 @@ module ElasticArSync
           end
         end
 
-        def default_index_setting
-          { index: { number_of_shards: 1 } }
+        def default_index_setting(kuromoji_default = false)
+          setting_attr = { index: { number_of_shards: 1 } }
+          setting_attr.merge!(ja_analyze_default) if kuromoji_default
+          setting_attr
+        end
+
+        def ja_analyze_default
+          {
+            "analysis": {
+              "analyzer": {
+                "normal_ja_analyzer": {
+                  "type": "custom",
+                  "tokenizer": "kuromiji_tokenizer",
+                  "mode": "search",
+                  "char_filter": [
+                    "icu_normalizer", # ユニコード正規化
+                    "kuromoji_iteration_mark" # 踊り字の正規化(時々=>時時、こゝろ=>こころ)
+                  ],
+                  "filter": [
+                    "kuromoji_baseform",
+                    "kuromoji_part_of_speech",
+                    "ja_stop",
+                    "lowercase",
+                    "kuromoji_number",
+                    "kuromoji_stemmer"
+                  ]
+                }
+              }
+            }
+          }
         end
 
         def default_index_mapping

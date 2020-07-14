@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    elastic_ar_sync (0.1.6)
+    elastic_ar_sync (0.1.7)
       rails (>= 5.1.0)
 
 GEM
