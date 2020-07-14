@@ -148,7 +148,7 @@ module ElasticArSync
         end
 
         def current_index
-          __elasticsearch__.client.indices.get_alias(index: index_name)
+          __elasticsearch__.client.indices.get_alias(index: index_name).keys.first
         end
 
         def current_mapping
@@ -156,7 +156,7 @@ module ElasticArSync
         end
 
         def current_settings
-          __elasticsearch__.client.indices.get_settings["settings"][current_index]
+          __elasticsearch__.client.indices.get_settings[current_index]
         end
       end
     end
