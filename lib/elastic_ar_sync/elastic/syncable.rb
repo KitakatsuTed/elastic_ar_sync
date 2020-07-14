@@ -99,7 +99,8 @@ module ElasticArSync
           mapping = {}
           attribute_types.each do |attribute, active_model_type|
             type = active_model_type.type
-            type = :text if (active_model_type.type.to_sym == :string) || (type == :integer && defined_enums.symbolize_keys.keys.include?(attribute.to_sym))
+            type = :text if (active_model_type.type.to_sym == :string)
+            type = :keyword if type == :integer && defined_enums.symbolize_keys.keys.include?(attribute.to_sym)
             type = :date if active_model_type.type == :datetime
             mapping[attribute.to_sym] = { type: type }
           end
