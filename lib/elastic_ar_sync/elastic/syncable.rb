@@ -106,8 +106,8 @@ module ElasticArSync
                   "tokenizer": "kuromoji_tokenizer",
                   "mode": "search",
                   "char_filter": [
-                    "icu_normalizer", # ユニコード正規化
-                    "kuromoji_iteration_mark" # 踊り字の正規化(時々=>時時、こゝろ=>こころ)
+                    "icu_normalizer",
+                    "kuromoji_iteration_mark"
                   ],
                   "filter": [
                     "kuromoji_baseform",
@@ -148,11 +148,15 @@ module ElasticArSync
         end
 
         def current_index
-          get_aliases.select { |_, value| value["aliases"].present? }.keys.first
+          __elasticsearch__.client.indices.get_alias(index: index_name)
         end
 
         def current_mapping
           __elasticsearch__.client.indices.get_mapping[current_index]["mappings"]["_doc"]["properties"]
+        end
+
+        def current_settings
+          __elasticsearch__.client.indices.get_settings["settings"][current_index]
         end
       end
     end
