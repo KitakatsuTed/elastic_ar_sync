@@ -103,7 +103,7 @@ module ElasticArSync
               "analyzer": {
                 "normal_ja_analyzer": {
                   "type": "custom",
-                  "tokenizer": "kuromiji_tokenizer",
+                  "tokenizer": "kuromoji_tokenizer",
                   "mode": "search",
                   "char_filter": [
                     "icu_normalizer", # ユニコード正規化
