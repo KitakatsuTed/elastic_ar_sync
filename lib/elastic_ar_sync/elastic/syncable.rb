@@ -78,6 +78,13 @@ module ElasticArSync
               attr_mappings.each do |key, value|
                 next unless value.is_a?(Hash)
 
+                if value[:type].to_s == 'nested'
+                  indexes key ,value.reject { |k, _| k.to_sym == :nested_attr } do
+                    value[:nested_attr].each { |key, value| indexes key, value }
+                  end
+                  next
+                end
+
                 indexes key, value
               end
             end
