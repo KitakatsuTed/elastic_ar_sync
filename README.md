@@ -1,6 +1,10 @@
 # ElasticArSync
 This repository contains easy set up modules for RDB and elasticsearch index with Active Record.
 This is based on `gem elasticsearch-rails`.
+
+日本語での説明はこちら
+https://ted-tech.hateblo.jp/entry/2020/08/11/103155
+
 ## Usage
 ### Preparation
 Install `gem sidekiq` and `gem redis-rails` to use Asynchronous processing for your app.
