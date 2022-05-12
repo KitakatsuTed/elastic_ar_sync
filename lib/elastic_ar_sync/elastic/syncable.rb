@@ -13,27 +13,27 @@ module ElasticArSync
         # after_commitでRDBを操作した時にESのインデックスも同期させる
         # アプリのサーバーに負荷をかけ無いように非同期で実行させる
         after_commit on: [:create] do
-          document_sync_create(self.class, id)
+          document_sync_create(self.class.to_s, id)
         end
 
         after_commit on: [:update] do
-          document_sync_update(self.class, id)
+          document_sync_update(self.class.to_s, id)
         end
 
         after_commit on: [:destroy] do
-          document_sync_delete(self.class, id)
+          document_sync_delete(self.class.to_s, id)
         end
 
-        def document_sync_create(klass, record_id)
-          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass, :index, record_id)
+        def document_sync_create(klass_str, record_id)
+          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, :index, record_id)
         end
 
-        def document_sync_update(klass, record_id)
-          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass, :index, record_id)
+        def document_sync_update(klass_str, record_id)
+          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, :index, record_id)
         end
 
-        def document_sync_delete(klass, record_id)
-          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass, :delete, record_id)
+        def document_sync_delete(klass_str, record_id)
+          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, :delete, record_id)
         end
 
         def as_indexed_json(_option = {})
@@ -60,7 +60,7 @@ module ElasticArSync
 
         # DBの内容をESのインデックスに同期する
         def import_all_record(target_index: ,batch_size: 100)
-          ElasticArSync::Elastic::Worker::IndexImportWorker.perform_async(self, target_index, batch_size)
+          ElasticArSync::Elastic::Worker::IndexImportWorker.perform_async(self.to_s, target_index, batch_size)
         end
 
         # ダウンタイムなしでインデックスを切り替える
