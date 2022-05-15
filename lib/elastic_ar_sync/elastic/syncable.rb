@@ -25,15 +25,15 @@ module ElasticArSync
         end
 
         def document_sync_create(klass_str, record_id)
-          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, :index, record_id)
+          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, 'index', record_id)
         end
 
         def document_sync_update(klass_str, record_id)
-          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, :index, record_id)
+          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, 'index', record_id)
         end
 
         def document_sync_delete(klass_str, record_id)
-          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, :delete, record_id)
+          ElasticArSync::Elastic::Worker::IndexWorker.perform_async(klass_str, 'delete', record_id)
         end
 
         def as_indexed_json(_option = {})
